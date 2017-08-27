@@ -1,0 +1,17 @@
+#-----------------------------------------------------------
+# Vivado v2016.4 (64-bit)
+# SW Build 1756540 on Mon Jan 23 19:11:23 MST 2017
+# IP Build 1755317 on Mon Jan 23 20:30:07 MST 2017
+# Start of session at: Sun Aug 27 19:30:41 2017
+# Process ID: 12344
+# Current directory: C:/Users/aptay/AppData/Roaming/Xilinx/Vivado
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent16372
+# Log file: C:/Users/aptay/AppData/Roaming/Xilinx/Vivado/vivado.log
+# Journal file: C:/Users/aptay/AppData/Roaming/Xilinx/Vivado\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project C:/hdl_projects/Z7-20/hdmi_out/proj/hdmi_out.xpr
+open_project C:/hdl_projects/MiniZed_full/MiniZed_full.xpr
+open_bd_design {C:/hdl_projects/MiniZed_full/MiniZed_full.srcs/sources_1/bd/design_1/design_1.bd}
+close_bd_design [get_bd_designs design_1]
+archive_project C:/hdl_projects/MiniZed_full.xpr.zip -temp_dir C:/Users/aptay/AppData/Roaming/Xilinx/Vivado/.Xil/Vivado-12344-DESKTOP-HQKVQ13 -force -include_config_settings

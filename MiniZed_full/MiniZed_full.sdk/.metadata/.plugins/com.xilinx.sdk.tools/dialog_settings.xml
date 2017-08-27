@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item value="&lt;None&gt;" key="programflash.hwplatform"/>
+	<item value="" key="fsbl_hwproj-offSet"/>
+	<item value="false" key="fsbl_hwproj-blankCheck"/>
+	<item value="Auto Detect" key="&lt;None&gt;-device"/>
+	<item value="qspi_single" key="fsbl_hwproj-flashType"/>
+	<item value="qspi_single" key="&lt;None&gt;-flashType"/>
+	<item value="Auto Detect" key="fsbl_hwproj-device"/>
+	<item value="" key="&lt;None&gt;-offSet"/>
+	<item value="" key="fsbl_hwproj-fsblFile"/>
+	<item value="" key="&lt;None&gt;-imgFile"/>
+	<item value="" key="&lt;None&gt;-fsblFile"/>
+	<item value="false" key="fsbl_hwproj-verifyFlash"/>
+	<item value="false" key="&lt;None&gt;-blankCheck"/>
+	<item value="MiniZed" key="&lt;None&gt;-target"/>
+	<item value="" key="fsbl_hwproj-imgFile"/>
+	<item value="MiniZed" key="fsbl_hwproj-target"/>
+	<item value="false" key="&lt;None&gt;-verifyFlash"/>
+</section>

@@ -1,0 +1,446 @@
+/******************************************************************************
+*
+* Copyright (C) 2009 - 2014 Xilinx, Inc.  All rights reserved.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
+*
+* Use of the Software is limited solely to applications:
+* (a) running on a Xilinx device, or
+* (b) that interact with a Xilinx device through a bus or interconnect.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+* XILINX  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+* OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*
+* Except as contained in this notice, the name of the Xilinx shall not be used
+* in advertising or otherwise to promote the sale, use or other dealings in
+* this Software without prior written authorization from Xilinx.
+*
+******************************************************************************/
+
+/*
+ * helloworld.c: simple test application
+ *
+ * This application configures UART 16550 to baud rate 9600.
+ * PS7 UART (Zynq) is not initialized by this application, since
+ * bootrom/bsp configures it to baud rate 115200
+ *
+ * ------------------------------------------------
+ * | UART TYPE   BAUD RATE                        |
+ * ------------------------------------------------
+ *   uartns550   9600
+ *   uartlite    Configurable only in HW design
+ *   ps7_uart    115200 (configured by bootrom/bsp)
+ */
+
+#include <stdio.h>
+#include "platform.h"
+#include "xiicps.h"
+#include "xspi.h"
+#include "xvtc.h"
+#include "xaxivdma.h"
+#include "xaxivdma_i.h"
+#include "xil_assert.h"
+
+#define IIC_DEVICE_ID		XPAR_XIICPS_0_DEVICE_ID
+#define SPI_DEVICE_ID		XPAR_AXI_QUAD_SPI_0_DEVICE_ID
+
+#define IIC_SLAVE_ADDR		0x2A
+#define IIC_SCLK_RATE		100000
+
+/*
+ * The following constant controls the length of the buffers to be sent
+ * and received with the IIC.
+ */
+#define TEST_BUFFER_SIZE	16
+#define data				164 //bytes
+#define loop				60 // 60 lines
+#define DEMO_MAX_FRAME (800*480*4)
+#define DEMO_STRIDE (800 * 4)
+#define DISPLAY_NUM_FRAMES 3
+
+XIicPs Iic;		/**< Instance of the IIC Device */
+//XSpi SpiInstance;
+XAxiVdma vdma;
+XAxiVdma_DmaSetup vdmaDMA; /*VDMA channel configuration*/
+XAxiVdma_Config *vdmaConfig;
+
+u8 SendBuffer[TEST_BUFFER_SIZE];    /**< Buffer for Transmitting Data */
+u8 RecvBuffer[TEST_BUFFER_SIZE];    /**< Buffer for Receiving Data */
+
+int IicPsMasterPolledExample(u16 DeviceId, u16 SpiDeviceId);
+
+u8 frameBuf[DISPLAY_NUM_FRAMES][DEMO_MAX_FRAME];
+u8 *pFrames[DISPLAY_NUM_FRAMES];
+
+int main()
+{
+    init_platform();
+    int status;
+    XVtc	VtcInst;
+    XVtc_Config *vtc_config;
+ //   XVtc_Signal *vtc_signal;
+   // XVtc_Timing *vtc_timing, *vtc_set;
+   // XVtc_HoriOffsets *vtc_offset,*vtc_offset_init;
+    //XVtc_SourceSelect *vtc_soruce;
+//    u32 height,width,Status;
+//    u32 vdma_stat;
+//    XAxiVdma InstancePtr;
+    XVtc_Timing vtcTiming;
+    XVtc_SourceSelect SourceSelect;
+
+    vtc_config = XVtc_LookupConfig(XPAR_VTC_0_DEVICE_ID);
+	XVtc_CfgInitialize(&VtcInst, vtc_config, vtc_config->BaseAddress);
+
+	vtcTiming.HActiveVideo = 800;
+	vtcTiming.HFrontPorch = 40;
+	vtcTiming.HSyncWidth = 128;
+	vtcTiming.HBackPorch = 88;
+	vtcTiming.HSyncPolarity = 0;
+	vtcTiming.VActiveVideo = 480;
+	vtcTiming.V0FrontPorch = 8;
+	vtcTiming.V0SyncWidth = 2;
+	vtcTiming.V0BackPorch = 35;
+	vtcTiming.V1FrontPorch = 8;
+	vtcTiming.V1SyncWidth = 2;
+	vtcTiming.V1BackPorch = 35;
+	vtcTiming.VSyncPolarity = 0;
+	vtcTiming.Interlaced = 0;
+
+	memset((void *)&SourceSelect, 0, sizeof(SourceSelect));
+	SourceSelect.VBlankPolSrc = 1;
+	SourceSelect.VSyncPolSrc = 1;
+	SourceSelect.HBlankPolSrc = 1;
+	SourceSelect.HSyncPolSrc = 1;
+	SourceSelect.ActiveVideoPolSrc = 1;
+	SourceSelect.ActiveChromaPolSrc= 1;
+	SourceSelect.VChromaSrc = 1;
+	SourceSelect.VActiveSrc = 1;
+	SourceSelect.VBackPorchSrc = 1;
+	SourceSelect.VSyncSrc = 1;
+	SourceSelect.VFrontPorchSrc = 1;
+	SourceSelect.VTotalSrc = 1;
+	SourceSelect.HActiveSrc = 1;
+	SourceSelect.HBackPorchSrc = 1;
+	SourceSelect.HSyncSrc = 1;
+	SourceSelect.HFrontPorchSrc = 1;
+	SourceSelect.HTotalSrc = 1;
+
+
+//	vtc_soruce->ActiveChromaPolSrc = 1;
+//	vtc_soruce->ActiveVideoPolSrc = 1;
+//	vtc_soruce->FieldIdPolSrc = 1;
+//	vtc_soruce->HActiveSrc = 1;
+//	vtc_soruce->HBackPorchSrc = 1;
+//	vtc_soruce->HBlankPolSrc = 1;
+//	vtc_soruce->HFrontPorchSrc = 1;
+//	vtc_soruce->HSyncPolSrc = 1;
+//	vtc_soruce->HSyncSrc = 1;
+//	vtc_soruce->HTotalSrc = 1;
+//	vtc_soruce->InterlacedMode = 1;
+//	vtc_soruce->VActiveSrc = 1;
+//	vtc_soruce->VBackPorchSrc =1;
+//	vtc_soruce->VBlankPolSrc = 1;
+//	vtc_soruce->VChromaSrc = 1;
+//	vtc_soruce->VFrontPorchSrc =1;
+//	vtc_soruce->VSyncPolSrc = 1;
+//	vtc_soruce->VSyncSrc = 1;
+//	vtc_soruce->VTotalSrc = 1;
+
+//	XVtc_GetGeneratorTiming(&VtcInst, vtc_timing);
+//
+//	vtc_set = vtc_timing;
+//	vtc_set->HSyncPolarity = 0;
+//	vtc_set->HActiveVideo = 800;
+//	vtc_set->HBackPorch = 88;
+//	vtc_set->HFrontPorch = 40;
+//	vtc_set->HSyncWidth = 128;
+//	vtc_set->V0FrontPorch = 8;
+//	vtc_set->V0SyncWidth = 2;
+//	vtc_set->V0BackPorch = 35;
+//	vtc_set->V1FrontPorch = 8;
+//	vtc_set->V1SyncWidth = 2;
+//	vtc_set->V1BackPorch = 35;
+//	vtc_set->VSyncPolarity = 0;
+//	vtc_set->VActiveVideo = 480;
+
+	//XVtc_RegUpdateEnable(&VtcInst);
+	XVtc_SetGeneratorTiming(&VtcInst,&vtcTiming);
+	XVtc_SetSource(&VtcInst, &SourceSelect);
+//	XVtc_GetGeneratorTiming(&VtcInst, vtc_timing);
+//	XVtc_GetGeneratorHoriOffset(&VtcInst,vtc_offset_init);
+	//vtc_offset = vtc_offset_init;
+		//vtc_offset->V0BlankHoriStart = 810;
+		//XVtc_SetGeneratorHoriOffset(&VtcInst,vtc_offset_init);
+	XVtc_EnableGenerator(&VtcInst);
+
+	status = XVtc_GetDetectionStatus(&VtcInst);
+	printf("vtc status %u\n\r",status);
+
+	//ptpg_config = XV_tpg_LookupConfig(XPAR_V_TPG_0_DEVICE_ID);
+	//XV_tpg_CfgInitialize(&ptpg, ptpg_config, ptpg_config->BaseAddress);
+
+	printf("Hello World\n\r");
+
+	printf("VTC\n\r");
+
+   // printf("Hsize %u \n\r", vtc_signal->HTotal);
+   // printf("Vsize %u \n\r", vtc_signal->V0Total);
+
+
+//	printf("HActive Video %u \n\r", vtc_timing->HActiveVideo);
+//	printf("HbackPorch Video %u \n\r", vtc_timing->HBackPorch);
+//	printf("HFrontPorch Video %u \n\r", vtc_timing->HFrontPorch);
+//	printf("HSync Polarity Video %u \n\r", vtc_timing->HSyncPolarity);
+//	printf("HSync Width Video %u \n\r", vtc_timing->HSyncWidth);
+//
+//	printf("V0 Back Porch %u \n\r", vtc_timing->V0BackPorch);
+//	printf("V0 Front Porch %u \n\r", vtc_timing->V0FrontPorch);
+//	printf("V0 sync Width %u \n\r", vtc_timing->V0SyncWidth);
+//	printf("V0 Active Video %u \n\r", vtc_timing->VActiveVideo);
+//	printf("V0 Sync Polarity %u \n\r", vtc_timing->VSyncPolarity);
+
+
+    printf("Hello World 2016.4\n\r");
+
+
+	for (int i = 0; i < 3; i++)
+	{
+		pFrames[i] = frameBuf[i];
+	}
+
+	vdmaConfig = XAxiVdma_LookupConfig(XPAR_AXIVDMA_0_DEVICE_ID);
+	XAxiVdma_CfgInitialize(&vdma, vdmaConfig, vdmaConfig->BaseAddress);
+//
+	vdmaDMA.FrameDelay = 0;
+	vdmaDMA.EnableCircularBuf = 1;
+	vdmaDMA.EnableSync = 0;
+	vdmaDMA.PointNum = 0;
+	vdmaDMA.EnableFrameCounter = 0;
+
+	vdmaDMA.VertSizeInput = 480;
+	vdmaDMA.HoriSizeInput = (800*4);
+	vdmaDMA.FixedFrameStoreAddr = 0;
+	vdmaDMA.FrameStoreStartAddr[0] = (u32)  pFrames[0];
+	vdmaDMA.Stride = DEMO_STRIDE;
+	  printf("Here\n\r");
+	XAxiVdma_DmaConfig(&vdma, XAXIVDMA_READ, &(vdmaDMA));
+	XAxiVdma_DmaSetBufferAddr(&vdma, XAXIVDMA_READ,vdmaDMA.FrameStoreStartAddr);
+	XAxiVdma_DmaStart(&vdma, XAXIVDMA_READ);
+	XAxiVdma_StartParking(&vdma, 0, XAXIVDMA_READ);
+
+    IicPsMasterPolledExample(IIC_DEVICE_ID, SPI_DEVICE_ID);
+    cleanup_platform();
+    return 0;
+}
+
+
+int IicPsMasterPolledExample(u16 DeviceId, u16 SpiDeviceId)
+{
+	int Status,i,segment,x,y,iPixelAddr;
+	XIicPs_Config *Config;
+	XSpi_Config *SpiConfig;
+	u8 Buffer[data];
+	u8 Image[loop][data];
+	XSpi SpiInstancePtr;
+	XIicPs Iic;
+
+	Config = XIicPs_LookupConfig(DeviceId);
+	if (NULL == Config) {
+		return XST_FAILURE;
+	}
+
+	Status = XIicPs_CfgInitialize(&Iic, Config, Config->BaseAddress);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
+
+	Status = XIicPs_SelfTest(&Iic);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
+
+	XIicPs_SetSClk(&Iic, IIC_SCLK_RATE);
+
+	SpiConfig = XSpi_LookupConfig(SpiDeviceId);
+	if (NULL == SpiConfig) {
+		return XST_FAILURE;
+	}
+
+	Status = XSpi_CfgInitialize(&SpiInstancePtr, SpiConfig,SpiConfig->BaseAddress);
+//		if (Status != XST_SUCCESS) {
+//			return XST_FAILURE;
+//		}
+
+	Status = XSpi_SelfTest(&SpiInstancePtr);
+		if (Status != XST_SUCCESS) {
+			return XST_FAILURE;
+		}
+
+	XSpi_SetOptions(&SpiInstancePtr, XSP_MASTER_OPTION | XSP_CLK_ACTIVE_LOW_OPTION
+				|XSP_CLK_PHASE_1_OPTION |XSP_MANUAL_SSELECT_OPTION );
+
+	XSpi_Start(&SpiInstancePtr);
+	XSpi_IntrGlobalDisable(&SpiInstancePtr);
+
+	//read status
+	SendBuffer[0] = 0x00;
+	SendBuffer[1] = 0x02;
+	XIicPs_MasterSendPolled(&Iic, SendBuffer,2, IIC_SLAVE_ADDR);
+	while (XIicPs_BusIsBusy(&Iic)) {
+		/* NOP */
+	}
+
+	//read and op status
+	XIicPs_MasterRecvPolled(&Iic, RecvBuffer,2, IIC_SLAVE_ADDR);
+	for(i =0; i<16; i++){
+	xil_printf("%X ", RecvBuffer[i]);
+	}
+	xil_printf("\n\r ");
+	while (XIicPs_BusIsBusy(&Iic)) {
+		/* NOP */
+	}
+
+	// set the AGC to enable
+	SendBuffer[0] = 0x00;
+	SendBuffer[1] = 0x08;
+	SendBuffer[2] = 0x00;
+	SendBuffer[3] = 0x01;
+	XIicPs_MasterSendPolled(&Iic, SendBuffer,
+				 4, IIC_SLAVE_ADDR);
+	while (XIicPs_BusIsBusy(&Iic)) {
+		/* NOP */
+	}
+
+	SendBuffer[0] = 0x00;
+	SendBuffer[1] = 0x0A;
+	SendBuffer[2] = 0x00;
+	SendBuffer[3] = 0x00;
+	XIicPs_MasterSendPolled(&Iic, SendBuffer,
+				 4, IIC_SLAVE_ADDR);
+	while (XIicPs_BusIsBusy(&Iic)) {
+		/* NOP */
+	}
+
+	SendBuffer[0] = 0x00;
+	SendBuffer[1] = 0x06;
+	SendBuffer[2] = 0x00;
+	SendBuffer[3] = 0x02;
+	XIicPs_MasterSendPolled(&Iic, SendBuffer,
+				 4, IIC_SLAVE_ADDR);
+	while (XIicPs_BusIsBusy(&Iic)) {
+		/* NOP */
+	}
+
+	SendBuffer[0] = 0x00;
+	SendBuffer[1] = 0x04;
+	SendBuffer[2] = 0x01;
+	SendBuffer[3] = 0x01;
+	XIicPs_MasterSendPolled(&Iic, SendBuffer,
+				 4, IIC_SLAVE_ADDR);
+	while (XIicPs_BusIsBusy(&Iic)) {
+		/* NOP */
+	}
+
+	//set rx buffer to 0
+	for(i =0; i<16; i++){
+	RecvBuffer[i] =0;
+	}
+
+	//read back AGC is enabled command
+	SendBuffer[0] = 0x00;
+	SendBuffer[1] = 0x04;
+	SendBuffer[2] = 0x01;
+	SendBuffer[3] = 0x00;
+	XIicPs_MasterSendPolled(&Iic, SendBuffer,
+				 4, IIC_SLAVE_ADDR);
+	while (XIicPs_BusIsBusy(&Iic)) {
+		/* NOP */
+	}
+
+	//set rx buffer to 0
+	for(i =0; i<16; i++){
+	RecvBuffer[i] =0;
+	}
+
+	// read back data and display
+	XIicPs_MasterRecvPolled(&Iic, RecvBuffer,4, IIC_SLAVE_ADDR);
+	while (XIicPs_BusIsBusy(&Iic)) {
+		/* NOP */
+	}
+	for(i =0; i<16; i++){
+	xil_printf("%X ", RecvBuffer[i]);
+	}
+	xil_printf("\n\r ");
+
+	//read and output status buffer
+	SendBuffer[0] = 0x00;
+	SendBuffer[1] = 0x02;
+	XIicPs_MasterSendPolled(&Iic, SendBuffer,
+				 2, IIC_SLAVE_ADDR);
+	while (XIicPs_BusIsBusy(&Iic)) {
+		/* NOP */
+	}
+	XIicPs_MasterRecvPolled(&Iic, RecvBuffer,2, IIC_SLAVE_ADDR);
+	for(i =0; i<16; i++){
+	xil_printf("%X ", RecvBuffer[i]);
+	}
+
+	//
+	SendBuffer[0] = 0x00;
+	SendBuffer[1] = 0x04;
+	SendBuffer[2] = 0x02;
+	SendBuffer[3] = 0x42;
+	XIicPs_MasterSendPolled(&Iic, SendBuffer,4, IIC_SLAVE_ADDR);
+	while (XIicPs_BusIsBusy(&Iic)) {
+		/* NOP */
+	}
+	xil_printf("\n\r ");
+	usleep(200000);
+
+
+while(1){
+//read out the image from the Camera module, resynchronising as necessary
+for(segment = 0; segment <loop; segment++){
+	XSpi_SetSlaveSelect(&SpiInstancePtr,0x01);
+	XSpi_Transfer(&SpiInstancePtr, Buffer , Buffer,	data);
+	if((Buffer[0] != 0xff)){
+		for(i =0; i<data/2; i++){
+			//scale to 8 bit as 8 bit op e.g. 8 bit red 8 bit blue 8 bit green we are using only one
+			Image[segment][i] = ((Buffer[2*i] << 8 | Buffer[2*i+1])>>8); //should scale to 8 bit
+		}
+	}
+	else {
+		segment = 0;
+	}
+
+}
+printf("image\r\n" );
+for(x = 0; x < (640); x++)
+		{
+			iPixelAddr = x;
+			for(y = 0; y < 480; y++)
+			//for(y = 0; y < 60; y++)
+			{
+				pFrames[iPixelAddr] = Image[(y/8)][(x/8)+4];
+				pFrames[iPixelAddr + 1] = 0;
+				pFrames[iPixelAddr + 2] = 0;
+				iPixelAddr += (800*4);
+			}
+		}
+Xil_DCacheFlushRange((unsigned int) pFrames, DEMO_MAX_FRAME);
+}
+	return XST_SUCCESS;
+}

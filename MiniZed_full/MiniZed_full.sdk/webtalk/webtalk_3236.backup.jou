@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Webtalk v2016.4 (64-bit)
+# SW Build 1756540 on Mon Jan 23 19:11:23 MST 2017
+# 
+# Start of session at: Sat Aug 12 18:32:49 2017
+# Process ID: 3236
+# Current directory: C:/Users/aptay/Downloads/MiniZed_PL2016_4/MiniZed_PL2016_4~/plnx_full/hardware/MiniZed_full/MiniZed_full.sdk/webtalk
+# Command line: wbtcv.exe -mode batch -source sdk_webtalk.tcl
+# Log file: C:/Users/aptay/Downloads/MiniZed_PL2016_4/MiniZed_PL2016_4~/plnx_full/hardware/MiniZed_full/MiniZed_full.sdk/webtalk/webtalk.log
+# Journal file: C:/Users/aptay/Downloads/MiniZed_PL2016_4/MiniZed_PL2016_4~/plnx_full/hardware/MiniZed_full/MiniZed_full.sdk/webtalk\webtalk.jou
+#-----------------------------------------------------------
+source sdk_webtalk.tcl

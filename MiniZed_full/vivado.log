@@ -1,0 +1,101 @@
+#-----------------------------------------------------------
+# Vivado v2016.4 (64-bit)
+# SW Build 1756540 on Mon Jan 23 19:11:23 MST 2017
+# IP Build 1755317 on Mon Jan 23 20:30:07 MST 2017
+# Start of session at: Sun Aug 27 19:30:41 2017
+# Process ID: 12344
+# Current directory: C:/Users/aptay/AppData/Roaming/Xilinx/Vivado
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent16372
+# Log file: C:/Users/aptay/AppData/Roaming/Xilinx/Vivado/vivado.log
+# Journal file: C:/Users/aptay/AppData/Roaming/Xilinx/Vivado\vivado.jou
+#-----------------------------------------------------------
+Sourcing tcl script 'C:/Xilinx/Vivado/2016.4/scripts/init.tcl'
+start_gui
+open_project C:/hdl_projects/Z7-20/hdmi_out/proj/hdmi_out.xpr
+Scanning sources...
+Finished scanning sources
+WARNING: [filemgmt 56-3] Board Part Repository Path: Could not find the directory '../repo/board_files'.
+INFO: [Common 17-41] Interrupt caught. Command should exit soon.
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository 'c:/hdl_projects/digilent'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/Xilinx/Vivado/2016.4/data/ip'.
+INFO: [Common 17-344] 'open_project' was cancelled
+open_project C:/hdl_projects/MiniZed_full/MiniZed_full.xpr
+Scanning sources...
+Finished scanning sources
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository 'c:/hdl_projects/digilent'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/Xilinx/Vivado/2016.4/data/ip'.
+open_project: Time (s): cpu = 00:00:27 ; elapsed = 00:00:19 . Memory (MB): peak = 1075.457 ; gain = 231.219
+open_bd_design {C:/hdl_projects/MiniZed_full/MiniZed_full.srcs/sources_1/bd/design_1/design_1.bd}
+Adding cell -- xilinx.com:ip:processing_system7:5.5 - processing_system7_0
+Adding cell -- xilinx.com:module_ref:wireless_mgr:1.0 - wireless_mgr_0
+Adding cell -- xilinx.com:ip:proc_sys_reset:5.0 - rst_ps7_0_50M
+Adding cell -- xilinx.com:ip:xlconstant:1.1 - xlconstant_0
+Adding cell -- xilinx.com:ip:axi_quad_spi:3.2 - axi_quad_spi_0
+Adding cell -- xilinx.com:ip:axi_vdma:6.2 - axi_vdma_0
+Adding cell -- xilinx.com:ip:v_axi4s_vid_out:4.0 - v_axi4s_vid_out_0
+Adding cell -- avnet.com:ip:zed_ali3_controller:1.7 - zed_ali3_controller_0
+Adding cell -- xilinx.com:ip:ila:6.2 - ila_0
+INFO: [xilinx.com:ip:ila:6.2-6] /ila_0: Xilinx recommends using the System ILA IP in IP Integrator. The System ILA IP is functionally equivalent to an ILA and offers additional benefits in debugging interfaces both within IP Integrator and the Hardware Manager. Consult the Programming and Debug User Guide UG908 for further details.
+Adding cell -- xilinx.com:ip:ila:6.2 - ila_1
+INFO: [xilinx.com:ip:ila:6.2-6] /ila_1: Xilinx recommends using the System ILA IP in IP Integrator. The System ILA IP is functionally equivalent to an ILA and offers additional benefits in debugging interfaces both within IP Integrator and the Hardware Manager. Consult the Programming and Debug User Guide UG908 for further details.
+Adding cell -- xilinx.com:ip:v_tc:6.1 - v_tc_0
+Adding cell -- xilinx.com:ip:xlconstant:1.1 - xlconstant_1
+Adding cell -- xilinx.com:ip:proc_sys_reset:5.0 - rst_ps7_0_50M1
+Adding cell -- xilinx.com:ip:axis_subset_converter:1.1 - axis_subset_converter_0
+Adding cell -- xilinx.com:ip:ila:6.2 - ila_2
+INFO: [xilinx.com:ip:ila:6.2-6] /ila_2: Xilinx recommends using the System ILA IP in IP Integrator. The System ILA IP is functionally equivalent to an ILA and offers additional benefits in debugging interfaces both within IP Integrator and the Hardware Manager. Consult the Programming and Debug User Guide UG908 for further details.
+Adding cell -- xilinx.com:ip:ila:6.2 - ila_3
+INFO: [xilinx.com:ip:ila:6.2-6] /ila_3: Xilinx recommends using the System ILA IP in IP Integrator. The System ILA IP is functionally equivalent to an ILA and offers additional benefits in debugging interfaces both within IP Integrator and the Hardware Manager. Consult the Programming and Debug User Guide UG908 for further details.
+Adding cell -- xilinx.com:ip:xlconstant:1.1 - xlconstant_2
+WARNING: [BD 41-1731] Type mismatch between connected pins: /wireless_mgr_0/SDIO_CLK_FB(undef) and /processing_system7_0/SDIO0_CLK_FB(clk)
+WARNING: [BD 41-1731] Type mismatch between connected pins: /zed_ali3_controller_0/clk_out(undef) and /v_axi4s_vid_out_0/vid_io_out_clk(clk)
+WARNING: [BD 41-1731] Type mismatch between connected pins: /zed_ali3_controller_0/clk_out(undef) and /ila_1/clk(clk)
+WARNING: [BD 41-1731] Type mismatch between connected pins: /zed_ali3_controller_0/clk_out(undef) and /v_tc_0/clk(clk)
+WARNING: [BD 41-1731] Type mismatch between connected pins: /zed_ali3_controller_0/clk_out(undef) and /ila_2/clk(clk)
+WARNING: [BD 41-1731] Type mismatch between connected pins: /processing_system7_0/FCLK_CLK2(clk) and /zed_ali3_controller_0/clk_in(undef)
+Adding cell -- xilinx.com:ip:axi_protocol_converter:2.1 - auto_pc
+Adding cell -- xilinx.com:ip:axi_crossbar:2.1 - xbar
+Adding cell -- xilinx.com:ip:axi_protocol_converter:2.1 - auto_pc
+Successfully read diagram <design_1> from BD file <C:/hdl_projects/MiniZed_full/MiniZed_full.srcs/sources_1/bd/design_1/design_1.bd>
+open_bd_design: Time (s): cpu = 00:00:09 ; elapsed = 00:00:07 . Memory (MB): peak = 1107.895 ; gain = 32.438
+close_bd_design [get_bd_designs design_1]
+archive_project C:/hdl_projects/MiniZed_full.xpr.zip -temp_dir C:/Users/aptay/AppData/Roaming/Xilinx/Vivado/.Xil/Vivado-12344-DESKTOP-HQKVQ13 -force -include_config_settings
+INFO: [Coretcl 2-137] starting archive...
+INFO: [Coretcl 2-1499] Saving project copy to temporary location 'C:/Users/aptay/AppData/Roaming/Xilinx/Vivado/.Xil/Vivado-12344-DESKTOP-HQKVQ13' for archiving project
+Scanning sources...
+Finished scanning sources
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository 'c:/hdl_projects/digilent'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/Xilinx/Vivado/2016.4/data/ip'.
+INFO: [Coretcl 2-1211] Creating project copy for archival...
+INFO: [ProjectBase 1-495] The host OS only allows 260 characters in a normal path. The project is stored in a path with more than 80 characters. If you experience any problem with archiving the project, please consider setting environment variable $TEMP to a shorter path.
+Current project path is 'C:/Users/aptay/AppData/Roaming/Xilinx/Vivado/.Xil/Vivado-12344-DESKTOP-HQKVQ13/PrjAr/_X_'.
+WARNING: [IP_Flow 19-3571] IP 'design_1_wireless_mgr_0_0' is restricted:
+* Module reference source file(s) not found.
+Please select 'Report IP Status' from the 'Tools/Report' menu or run Tcl command 'report_ip_status' for more information.
+INFO: [IP_Flow 19-2228] Inferred bus interface 'SDIO' of definition 'avnet.com:interface:avnet_hdmi:1.0'.
+INFO: [IP_Flow 19-2228] Inferred bus interface 'SDIO_FB' of definition 'avnet.com:interface:avnet_hdmi:1.0'.
+INFO: [IP_Flow 19-2228] Inferred bus interface 'SDIO_dir' of definition 'avnet.com:interface:avnet_hdmi:1.0'.
+INFO: [IP_Flow 19-2228] Inferred bus interface 'SDIO_from_Zynq' of definition 'avnet.com:interface:avnet_hdmi:1.0'.
+INFO: [IP_Flow 19-2228] Inferred bus interface 'SDIO_to_Zynq' of definition 'avnet.com:interface:avnet_hdmi:1.0'.
+INFO: [IP_Flow 19-2228] Inferred bus interface 'WL_SDIO' of definition 'avnet.com:interface:avnet_hdmi:1.0'.
+INFO: [IP_Flow 19-4753] Inferred signal 'clock' from port 'SDIO_CLK' as interface 'SDIO_CLK'.
+INFO: [IP_Flow 19-4753] Inferred signal 'clock' from port 'WL_SDIO_CLK' as interface 'WL_SDIO_CLK'.
+WARNING: [IP_Flow 19-1965] Bus Interface 'SDIO': A port map to the required logical port "DATA" of the bus abstraction "avnet.com:interface:avnet_hdmi_rtl:1.0" is missing.
+WARNING: [IP_Flow 19-1965] Bus Interface 'SDIO_FB': A port map to the required logical port "DATA" of the bus abstraction "avnet.com:interface:avnet_hdmi_rtl:1.0" is missing.
+WARNING: [IP_Flow 19-1965] Bus Interface 'SDIO_to_Zynq': A port map to the required logical port "CLK" of the bus abstraction "avnet.com:interface:avnet_hdmi_rtl:1.0" is missing.
+WARNING: [IP_Flow 19-1965] Bus Interface 'WL_SDIO': A port map to the required logical port "DATA" of the bus abstraction "avnet.com:interface:avnet_hdmi_rtl:1.0" is missing.
+WARNING: [IP_Flow 19-3153] Bus Interface 'SDIO_CLK': ASSOCIATED_BUSIF bus parameter is missing.
+WARNING: [IP_Flow 19-3153] Bus Interface 'WL_SDIO_CLK': ASSOCIATED_BUSIF bus parameter is missing.
+CRITICAL WARNING: [IP_Flow 19-4751] Bus Interface 'WL_SDIO_CLK': FREQ_HZ bus parameter is missing for output clock interface.
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository 'c:/hdl_projects/digilent'.
+INFO: [Coretcl 2-1213] Including run results for 'synth_1'
+INFO: [Coretcl 2-1213] Including run results for 'impl_1'
+INFO: [Coretcl 2-1212] Importing remotely added design sources and verilog include files (if any)...
+INFO: [filemgmt 20-334] All file(s) are already imported in fileset: 'constrs_1'
+INFO: [filemgmt 20-348] Importing the appropriate files for fileset: 'constrs_1'
+INFO: [filemgmt 20-334] All file(s) are already imported in fileset: 'sources_1'
+INFO: [filemgmt 20-348] Importing the appropriate files for fileset: 'sources_1'
